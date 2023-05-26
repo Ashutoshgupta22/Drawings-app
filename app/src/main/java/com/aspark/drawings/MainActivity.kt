@@ -3,6 +3,7 @@ package com.aspark.drawings
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import com.aspark.drawings.bottom_sheet.AddDrawingBottomSheet
 import com.aspark.drawings.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -18,9 +19,16 @@ class MainActivity : AppCompatActivity() {
 
         binding.fabAddDrawing.setOnClickListener {
 
+            showAddDrawingBottomSheet()
 
         }
 
+    }
+
+    private fun showAddDrawingBottomSheet() {
+
+        val bottomSheetDialog = AddDrawingBottomSheet()
+        bottomSheetDialog.show(supportFragmentManager,"AddDrawingBottomSheet")
 
     }
 }
