@@ -1,5 +1,6 @@
 package com.aspark.drawings
 
+import android.content.Intent
 import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -10,15 +11,25 @@ import com.aspark.drawings.model.Drawing
 import com.bumptech.glide.Glide
 
 
-class DrawingAdapter(private val drawingList:  List<Drawing>): RecyclerView.Adapter<DrawingAdapter.ViewHolder>() {
+class DrawingAdapter(private val drawingList:  List<Drawing>):
+    RecyclerView.Adapter<DrawingAdapter.ViewHolder>() {
 
-    class ViewHolder(binding: ItemDrawingBinding) : RecyclerView.ViewHolder(binding.root) {
+   inner class ViewHolder(binding: ItemDrawingBinding) : RecyclerView.ViewHolder(binding.root) {
 
         val tvName = binding.tvName
         val markers = binding.tvMarkers
         val timeAdded = binding.tvTimeAdded
         val image = binding.ivDrawingImg
 
+        init {
+            binding.root.setOnClickListener {
+
+                val intent = Intent(it.context,DrawingProfileActivity::class.java)
+                intent.putExtra("drawing",drawingList[adapterPosition])
+                it.context.startActivity(intent)
+
+            }
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -38,9 +49,6 @@ class DrawingAdapter(private val drawingList:  List<Drawing>): RecyclerView.Adap
 
         holder.timeAdded.text = formatTime(timeAdded)
         val uri = drawingList[position].imagePath.toUri()
-//
-//        val contentResolver = holder.itemView.context.contentResolver
-//        contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
 
         Glide
             .with(holder.itemView.context)

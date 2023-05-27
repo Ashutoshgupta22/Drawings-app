@@ -15,6 +15,14 @@
         android:theme="@style/Theme.Drawings"
         tools:targetApi="31">
         <activity
+            android:name=".FullImageActivity"
+            android:exported="false"
+            android:label="@string/title_activity_full_image"
+            android:theme="@style/Theme.Drawings" />
+        <activity
+            android:name=".DrawingProfileActivity"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
