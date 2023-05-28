@@ -11,5 +11,7 @@ data class Marker(
     val id: Int = 0,
     val title: String,
     val details: String,
-    @ColumnInfo(name = "drawing_id") val drawingId: Int
+    @ColumnInfo(name = "drawing_id") val drawingId: Int,
+    @ColumnInfo(name = "tap_x") val doubleTapX: Float,
+    @ColumnInfo(name = "tap_y") val doubleTapY: Float,
     )

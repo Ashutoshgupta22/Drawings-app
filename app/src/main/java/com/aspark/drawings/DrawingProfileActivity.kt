@@ -36,6 +36,8 @@ class DrawingProfileActivity : AppCompatActivity() {
 
             val intent = Intent(this,FullImageActivity::class.java)
             intent.putExtra("imagePath",drawing.imagePath)
+            intent.putExtra("drawingId", drawing.id)
+            intent.putExtra("markerCount",drawing.markers)
             startActivity(intent)
 
         }

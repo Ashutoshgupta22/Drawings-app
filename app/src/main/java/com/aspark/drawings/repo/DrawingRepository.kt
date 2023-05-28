@@ -14,4 +14,9 @@ class DrawingRepository(private val drawingDao: DrawingDao) {
 
        return drawingDao.getAllDrawings()
     }
+
+    fun updateMarkerCount(drawingId: Int, count: Int) {
+
+        drawingDao.updateMarkerCount(drawingId,count)
+    }
 }

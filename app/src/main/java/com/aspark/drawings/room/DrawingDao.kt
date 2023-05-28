@@ -13,4 +13,7 @@ interface DrawingDao {
 
     @Query("SELECT * from drawing")
     fun getAllDrawings() : List<Drawing>
+
+    @Query("UPDATE drawing SET no_of_markers = :count WHERE id = :drawingId ")
+    fun updateMarkerCount(drawingId: Int, count: Int)
 }
