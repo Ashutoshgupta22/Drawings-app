@@ -1,22 +1,29 @@
 package com.aspark.drawings
 
 import android.annotation.SuppressLint
+import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
+import android.view.Gravity
 import android.view.MotionEvent
+import android.view.View
+import android.view.ViewGroup
+import android.widget.FrameLayout
+import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
 import com.aspark.drawings.bottom_sheet.AddMarkerBottomSheet
 import com.aspark.drawings.databinding.ActivityFullImageBinding
+import com.aspark.drawings.model.Marker
 import com.aspark.drawings.room.AppDatabase.Companion.getDatabase
 import com.bumptech.glide.Glide
 
 class FullImageActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityFullImageBinding
-    val viewModel: AddMarkerViewModel by viewModels()
+    private val viewModel: AddMarkerViewModel by viewModels()
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,25 +37,9 @@ class FullImageActivity : AppCompatActivity() {
         val markerCount = intent.getIntExtra("markerCount",-1)
 
         val markerDao = getDatabase(applicationContext).markerDao()
-        viewModel.getMarkers(drawingId, markerDao)
+        viewModel.getAllMarkers(drawingId, markerDao)
 
-        viewModel.markersList.observe(this) {
-
-//            if ( ! it.isNullOrEmpty()) {
-//
-//                for ( marker in viewModel.markersList) {
-//
-//                    val markerView = createMarkerView(marker.id)
-//                    val layoutParams = RelativeLayout.LayoutParams(
-//                        ViewGroup.LayoutParams.WRAP_CONTENT,
-//                        ViewGroup.LayoutParams.WRAP_CONTENT
-//                    )
-//                    layoutParams.leftMargin = marker.x.toInt()
-//                    layoutParams.topMargin = marker.y.toInt()
-//                    imageViewDrawing.addView(markerView, layoutParams)
-//                }
-//            }
-        }
+        registerObservers()
 
         Glide
             .with(this)
@@ -61,25 +52,32 @@ class FullImageActivity : AppCompatActivity() {
         binding.ivFullImage.setOnTouchListener { v, event ->
 
             Log.d("FullImageActivity", "onCreate: fullImage touch")
-           val doubleTapX = v.x + v.width / 2
-           val doubleTapY = v.y + v.height / 2
 
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
                     if (doubleTapDetected) {
-                        // Double-tap detected, handle the event here
+
                         Log.d("FullImageActivity", "onCreate: doubleTap detected")
-                        val addMarkerBottomSheet = AddMarkerBottomSheet(drawingId, markerCount,
-                            doubleTapX, doubleTapY)
 
-                        addMarkerBottomSheet.show(supportFragmentManager,
-                            "AddMarkerBottomSheet")
+                        if (drawingId != -1 && markerCount != -1) {
 
+                            val addMarkerBottomSheet = AddMarkerBottomSheet(
+                                drawingId, markerCount, event.x, event.y, null) {
+
+                                registerObservers()
+                                viewModel.getAllMarkers(drawingId, markerDao)
+                            }
+
+                            addMarkerBottomSheet.show(supportFragmentManager,
+                                "AddMarkerBottomSheet")
+                        }
                         doubleTapDetected = false
                         true
 
                     } else {
+
                         // Wait for a short delay to check for a second tap
+
                         doubleTapDetected = true
                         Handler().postDelayed({
                             doubleTapDetected = false
@@ -92,41 +90,55 @@ class FullImageActivity : AppCompatActivity() {
                 else -> false
             }
 
-//            val gestureDetector = GestureDetector(this,
-//                object : GestureDetector.SimpleOnGestureListener() {
-//
-//                    override fun onDoubleTap(e: MotionEvent): Boolean {
-//
-//                        Log.i("FullImageActivity", "onDoubleTap: FullImage Double tap")
-//
-//                        if (drawingId != -1) {
-//
-//                            val addMarkerBottomSheet = AddMarkerBottomSheet(drawingId,
-//                                doubleTapX, doubleTapY)
-//                            addMarkerBottomSheet.show(supportFragmentManager,
-//                                "AddMarkerBottomSheet")
-//                        }
-//                        return true
-//                    }
-//
-//                    override fun onDoubleTapEvent(e: MotionEvent): Boolean {
-//                        return true
-//                    }
-//                })
-//            gestureDetector.onTouchEvent(event)
         }
     }
 
-//    private fun createMarkerView(markerId: Int): View {
-//
-//        val markerTextView = TextView(this)
-//        markerTextView.text = (markerId + 1).toString()
-//        markerTextView.setTextColor(Color.WHITE)
-//        markerTextView.setBackgroundResource(R.drawable.marker_background)
-//        markerTextView.setPadding(16, 8, 16, 8)
-//        markerTextView.gravity = Gravity.CENTER
-//
-//        return markerTextView
-//    }
+    private fun createMarkerView(markerNumber: Int, marker: Marker): View {
+
+        val markerTextView = TextView(this)
+        markerTextView.text = (markerNumber).toString()
+        markerTextView.setTextColor(Color.WHITE)
+        markerTextView.setBackgroundResource(R.drawable.bg_marker)
+        markerTextView.setPadding(16, 8, 16, 8)
+        markerTextView.gravity = Gravity.CENTER
+
+        markerTextView.setOnClickListener {
+
+            val markerBottomSheet = AddMarkerBottomSheet(marker.drawingId,
+                viewModel.markersList.value?.size!!,
+                marker.doubleTapX, marker.doubleTapY, marker){
+
+            }
+            markerBottomSheet.show(supportFragmentManager,"EditMarkerBottomSheet")
+        }
+
+        return markerTextView
+    }
+
+    private fun registerObservers() {
+
+        Log.d("FullImageActivity", "registerObservers: called ")
+
+        viewModel.markersList.observe(this) {
+
+            if ( ! it.isNullOrEmpty()) {
+
+                binding.markerOverlay.removeAllViews()
+
+                for ((count, marker) in viewModel.markersList.value!!.withIndex()) {
+
+                    val markerView = createMarkerView(count + 1, marker)
+                    val layoutParams = FrameLayout.LayoutParams(
+                        ViewGroup.LayoutParams.WRAP_CONTENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT)
+
+                    layoutParams.leftMargin = marker.doubleTapX.toInt()
+                    layoutParams.topMargin = marker.doubleTapY.toInt()
+                    binding.markerOverlay.addView(markerView, layoutParams)
+                }
+            }
+        }
+
+    }
 
 }

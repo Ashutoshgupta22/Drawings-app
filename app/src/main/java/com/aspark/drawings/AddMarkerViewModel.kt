@@ -22,36 +22,49 @@ class AddMarkerViewModel: ViewModel() {
 
     fun saveMarker(
         drawingId: Int, title: String, details: String,
-        doubleTapX: Float, doubleTapY: Float, markerDao: MarkerDao) {
+        doubleTapX: Float, doubleTapY: Float, count: Int,
+        markerDao: MarkerDao,
+        drawingDao: DrawingDao) {
 
         Log.d("FullImageViewModel", "onImageDoubleTapped: $doubleTapX $doubleTapY")
 
         val marker = Marker(title = title, details = details, drawingId = drawingId,
         doubleTapX = doubleTapX, doubleTapY = doubleTapY)
 
-         viewModelScope.launch(Dispatchers.IO) {
+        val job = viewModelScope.launch(Dispatchers.IO) {
 
             MarkerRepository(markerDao).insertMarker(marker)
         }
 
+        job.invokeOnCompletion {
+
+            if (job.isCompleted) {
+
+                Log.d(Thread.currentThread().name, "saveMarker: job completed")
+                updateMarkerCount(drawingId,count,drawingDao)
+                getAllMarkers(drawingId,markerDao)
+            }
+        }
     }
 
-    fun addMarkerCount(drawingId: Int, i: Int, drawingDao: DrawingDao) {
+    private fun updateMarkerCount(drawingId: Int, count: Int, drawingDao: DrawingDao) {
 
+        Log.d("AddMarkerViewModel", "updateMarkerCount: called")
         viewModelScope.launch(Dispatchers.IO) {
-            DrawingRepository(drawingDao).updateMarkerCount(drawingId,i)
+            DrawingRepository(drawingDao).updateMarkerCount(drawingId,count)
         }
 
     }
 
-    fun getMarkers(drawingId: Int, markerDao: MarkerDao) {
+    fun getAllMarkers(drawingId: Int, markerDao: MarkerDao) {
 
+        Log.d("AddMarkerViewModel", "getAllMarkers: called")
 
         viewModelScope.launch(Dispatchers.Default) {
             val list =  MarkerRepository(markerDao).getAllMarkers(drawingId)
 
             withContext(Dispatchers.Main) {
-                mMarkersList.value = list
+                mMarkersList.postValue(list)
             }
         }
 

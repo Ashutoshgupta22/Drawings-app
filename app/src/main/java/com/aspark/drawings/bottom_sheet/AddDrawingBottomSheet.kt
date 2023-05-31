@@ -1,5 +1,7 @@
 package com.aspark.drawings.bottom_sheet
 
+import android.content.DialogInterface
+import android.content.DialogInterface.OnDismissListener
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -13,11 +15,11 @@ import com.aspark.drawings.databinding.AddDrawingBottomSheetBinding
 import com.aspark.drawings.room.AppDatabase.Companion.getDatabase
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
-class AddDrawingBottomSheet: BottomSheetDialogFragment() {
+class AddDrawingBottomSheet(private val listener: OnDismissListener): BottomSheetDialogFragment() {
 
     private lateinit var binding: AddDrawingBottomSheetBinding
     private val viewModel: AddDrawingViewModel by viewModels()
-    private lateinit var  imagePath:String
+    private lateinit var imagePath:String
     private lateinit var picker: ActivityResultLauncher<PickVisualMediaRequest>
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -30,6 +32,8 @@ class AddDrawingBottomSheet: BottomSheetDialogFragment() {
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
+
 
         binding.cvAddDrawingImg.setOnClickListener {
 
@@ -47,6 +51,16 @@ class AddDrawingBottomSheet: BottomSheetDialogFragment() {
 
             viewModel.addDrawing(title,imagePath,timeAdded,drawingDao)
             dismiss()
+            listener.onDismiss(object :  DialogInterface {
+                override fun cancel() {
+                    TODO("Not yet implemented")
+                }
+
+                override fun dismiss() {
+                    Log.d("AddDrawingBottomSheet", "dismissed ")
+                }
+
+            })
 
         }
 
@@ -57,6 +71,7 @@ class AddDrawingBottomSheet: BottomSheetDialogFragment() {
 
 
     }
+
 
     private fun registerPhotoPicker() {
 
