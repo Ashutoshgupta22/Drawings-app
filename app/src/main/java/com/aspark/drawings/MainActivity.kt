@@ -36,14 +36,10 @@ class MainActivity : AppCompatActivity() {
         drawingDao = getDatabase(applicationContext).drawingDao()
         viewModel.getAllDrawings(drawingDao)
 
-       // registerDrawingListObserver()
-
         binding.fabAddDrawing.setOnClickListener {
 
             showAddDrawingBottomSheet()
         }
-
-
     }
 
     private fun checkStoragePermission() {
@@ -55,10 +51,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         else{
-
             requestStoragePermission()
         }
-
     }
 
     private fun requestStoragePermission() {
@@ -88,11 +82,8 @@ class MainActivity : AppCompatActivity() {
 
             registerDrawingListObserver()
             viewModel.getAllDrawings(drawingDao)
-
         }
         bottomSheetDialog.show(supportFragmentManager,"AddDrawingBottomSheet")
-
-
     }
 
    private fun registerDrawingListObserver() {
@@ -101,7 +92,7 @@ class MainActivity : AppCompatActivity() {
 
        viewModel.drawingList.observe(this) {
 
-           it.let {
+           it?.let {
 
                if (it.isNotEmpty()){
 

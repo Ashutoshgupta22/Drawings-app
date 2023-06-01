@@ -1,13 +1,13 @@
 package com.aspark.drawings
 
 import android.content.Intent
-import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.net.toUri
 import androidx.recyclerview.widget.RecyclerView
 import com.aspark.drawings.databinding.ItemDrawingBinding
 import com.aspark.drawings.model.Drawing
+import com.aspark.drawings.utility.Utility
 import com.bumptech.glide.Glide
 
 
@@ -25,7 +25,7 @@ class DrawingAdapter(private val drawingList:  List<Drawing>):
             binding.root.setOnClickListener {
 
                 val intent = Intent(it.context,DrawingProfileActivity::class.java)
-                intent.putExtra("drawing",drawingList[adapterPosition])
+                intent.putExtra("drawingId",drawingList[adapterPosition].id)
                 it.context.startActivity(intent)
 
             }
@@ -47,7 +47,7 @@ class DrawingAdapter(private val drawingList:  List<Drawing>):
         val timeAdded = drawingList[position].timeAdded
         holder.image.clipToOutline = true
 
-        holder.timeAdded.text = formatTime(timeAdded)
+        holder.timeAdded.text = Utility().formatTime(timeAdded)
         val uri = drawingList[position].imagePath.toUri()
 
         Glide
@@ -63,13 +63,4 @@ class DrawingAdapter(private val drawingList:  List<Drawing>):
         return drawingList.size
     }
 
-    private fun formatTime(millis: Long): String {
-
-        val now = System.currentTimeMillis()
-
-        val formattedTime = DateUtils.getRelativeTimeSpanString(millis, now,
-             DateUtils.MINUTE_IN_MILLIS)
-
-        return formattedTime.toString()
     }
-}

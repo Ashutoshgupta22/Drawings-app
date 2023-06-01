@@ -8,7 +8,11 @@ class DrawingRepository(private val drawingDao: DrawingDao) {
 
     fun insertDrawing(drawing: Drawing) {
         drawingDao.insert(drawing)
+    }
 
+    fun getDrawingById(id: Int): Drawing {
+
+        return drawingDao.getDrawingById(id)
     }
 
     fun getAllDrawings(): List<Drawing> {
