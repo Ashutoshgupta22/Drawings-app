@@ -24,11 +24,16 @@ class AddDrawingViewModel: ViewModel() {
 
        if (isVerified){
 
-           viewModelScope.launch(Dispatchers.IO){
+           val job = viewModelScope.launch(Dispatchers.IO){
 
                val drawing = Drawing(name = title, imagePath = imagePath,
                    markers = 0, timeAdded = timeAdded)
                drawingRepo.insertDrawing(drawing)
+           }
+
+           job.invokeOnCompletion {
+               if (job.isCompleted)
+                   getAllDrawings(drawingDao)
            }
 
        }

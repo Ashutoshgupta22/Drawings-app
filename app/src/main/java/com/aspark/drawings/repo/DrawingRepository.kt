@@ -1,5 +1,6 @@
 package com.aspark.drawings.repo
 
+import android.util.Log
 import com.aspark.drawings.model.Drawing
 import com.aspark.drawings.room.DrawingDao
 
@@ -17,6 +18,8 @@ class DrawingRepository(private val drawingDao: DrawingDao) {
 
     fun updateMarkerCount(drawingId: Int, count: Int) {
 
+        Log.i("DrawingRepo", "updateMarkerCount: drawingId= $drawingId, " +
+                "count= $count")
         drawingDao.updateMarkerCount(drawingId,count)
     }
 }

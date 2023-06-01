@@ -18,15 +18,13 @@ class AddMarkerViewModel: ViewModel() {
 
     private var mMarkersList = MutableLiveData<List<Marker>>()
     val markersList: LiveData<List<Marker>> = mMarkersList
+    private var _markerCount = MutableLiveData<Int>()
+    val markerCount: LiveData<Int> = _markerCount
 
 
-    fun saveMarker(
-        drawingId: Int, title: String, details: String,
-        doubleTapX: Float, doubleTapY: Float, count: Int,
-        markerDao: MarkerDao,
+    fun saveMarker( drawingId: Int, title: String, details: String,
+        doubleTapX: Float, doubleTapY: Float, markerDao: MarkerDao,
         drawingDao: DrawingDao) {
-
-        Log.d("FullImageViewModel", "onImageDoubleTapped: $doubleTapX $doubleTapY")
 
         val marker = Marker(title = title, details = details, drawingId = drawingId,
         doubleTapX = doubleTapX, doubleTapY = doubleTapY)
@@ -41,8 +39,10 @@ class AddMarkerViewModel: ViewModel() {
             if (job.isCompleted) {
 
                 Log.d(Thread.currentThread().name, "saveMarker: job completed")
-                updateMarkerCount(drawingId,count,drawingDao)
-                getAllMarkers(drawingId,markerDao)
+
+                updateMarkerCount(drawingId,_markerCount.value?.plus(1)!!, drawingDao)
+                _markerCount.postValue(_markerCount.value?.plus(1))
+                getAllMarkers(drawingId, markerDao)
             }
         }
     }
@@ -70,5 +70,12 @@ class AddMarkerViewModel: ViewModel() {
 
     }
 
+    fun setMarkerCount(count: Int) {
 
+        Log.i("AddMarkerViewModel", "setMarkerCount: count = $count ")
+
+        _markerCount.value = count
+        Log.i("AddMarkerViewModel", "setMarkerCount: ${_markerCount.value} ")
+
+    }
 }

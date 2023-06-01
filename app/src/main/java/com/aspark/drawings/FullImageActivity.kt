@@ -32,6 +32,8 @@ class FullImageActivity : AppCompatActivity() {
         binding = ActivityFullImageBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        Log.i("FullImageActivity", "onCreate: called")
+
         val imagePath = intent.getStringExtra("imagePath")
         val drawingId = intent.getIntExtra("drawingId",-1)
         val markerCount = intent.getIntExtra("markerCount",-1)
@@ -40,6 +42,7 @@ class FullImageActivity : AppCompatActivity() {
         viewModel.getAllMarkers(drawingId, markerDao)
 
         registerObservers()
+        viewModel.setMarkerCount(markerCount)
 
         Glide
             .with(this)
@@ -59,10 +62,10 @@ class FullImageActivity : AppCompatActivity() {
 
                         Log.d("FullImageActivity", "onCreate: doubleTap detected")
 
-                        if (drawingId != -1 && markerCount != -1) {
+                        if (drawingId != -1 && viewModel.markerCount.value != -1) {
 
-                            val addMarkerBottomSheet = AddMarkerBottomSheet(
-                                drawingId, markerCount, event.x, event.y, null) {
+                            val addMarkerBottomSheet = AddMarkerBottomSheet( drawingId,
+                                event.x, event.y, null) {
 
                                 registerObservers()
                                 viewModel.getAllMarkers(drawingId, markerDao)
@@ -105,8 +108,7 @@ class FullImageActivity : AppCompatActivity() {
         markerTextView.setOnClickListener {
 
             val markerBottomSheet = AddMarkerBottomSheet(marker.drawingId,
-                viewModel.markersList.value?.size!!,
-                marker.doubleTapX, marker.doubleTapY, marker){
+                marker.doubleTapX, marker.doubleTapY, marker) {
 
             }
             markerBottomSheet.show(supportFragmentManager,"EditMarkerBottomSheet")

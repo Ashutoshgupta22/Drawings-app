@@ -10,7 +10,7 @@ import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import com.aspark.drawings.databinding.AddDrawingBottomSheetBinding
 import com.aspark.drawings.room.AppDatabase.Companion.getDatabase
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -18,7 +18,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 class AddDrawingBottomSheet(private val listener: OnDismissListener): BottomSheetDialogFragment() {
 
     private lateinit var binding: AddDrawingBottomSheetBinding
-    private val viewModel: AddDrawingViewModel by viewModels()
+    private val viewModel: AddDrawingViewModel by activityViewModels()
     private lateinit var imagePath:String
     private lateinit var picker: ActivityResultLauncher<PickVisualMediaRequest>
 

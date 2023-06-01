@@ -7,7 +7,7 @@ import android.text.Editable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import com.aspark.drawings.AddMarkerViewModel
 import com.aspark.drawings.databinding.AddMarkerBottomSheetBinding
 import com.aspark.drawings.model.Marker
@@ -16,14 +16,13 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 class AddMarkerBottomSheet(
     private val drawingId: Int,
-    private val markerCount: Int,
     private val doubleTapX: Float,
     private val doubleTapY: Float,
     private val marker: Marker?,
-    private val listener: OnDismissListener ) : BottomSheetDialogFragment() {
+    private val listener: OnDismissListener) : BottomSheetDialogFragment() {
 
     private lateinit var binding: AddMarkerBottomSheetBinding
-    private val viewModel: AddMarkerViewModel by viewModels()
+    private val viewModel: AddMarkerViewModel by activityViewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?): View? {
@@ -55,8 +54,9 @@ class AddMarkerBottomSheet(
             val details = binding.etMarkerDetails.text.toString().trim()
 
             viewModel.saveMarker(drawingId, title, details, doubleTapX, doubleTapY,
-                markerCount+1, markerDao, drawingDao)
+                markerDao, drawingDao)
             dismiss()
+
             listener.onDismiss(object : DialogInterface {
                 override fun cancel() {
                     TODO("Not yet implemented")
