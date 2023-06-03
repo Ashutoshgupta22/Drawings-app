@@ -2,11 +2,14 @@ package com.aspark.drawings
 
 import android.annotation.SuppressLint
 import android.graphics.Color
+import android.graphics.Matrix
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
+import android.view.GestureDetector
 import android.view.Gravity
 import android.view.MotionEvent
+import android.view.ScaleGestureDetector
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
@@ -24,6 +27,8 @@ class FullImageActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityFullImageBinding
     private val viewModel: AddMarkerViewModel by viewModels()
+    private var scaleFactor = 1f
+    private var matrix: Matrix = Matrix()
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,15 +54,61 @@ class FullImageActivity : AppCompatActivity() {
             .load(imagePath?.toUri())
             .into(binding.ivFullImage)
 
+
+        val scaleGestureDetector = ScaleGestureDetector(this,
+            object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
+
+                override fun onScale(detector: ScaleGestureDetector): Boolean {
+
+                    Log.i("FullImageActivity", "onScale: zooming in")
+
+                    scaleFactor *= detector.scaleFactor
+                    scaleFactor = scaleFactor.coerceIn(1f,5f)
+
+                    val focusX = detector.focusX
+                    val focusY = detector.focusY
+
+                    matrix.setScale(scaleFactor, scaleFactor, focusX, focusY)
+                    binding.ivFullImage.imageMatrix = matrix
+
+                    return true
+                }
+
+        })
+
+        val gestureDetector = GestureDetector(this, object :
+            GestureDetector.SimpleOnGestureListener() {
+
+            override fun onDoubleTap(e: MotionEvent): Boolean {
+
+                scaleFactor = 1f
+                matrix.reset()
+
+                binding.ivFullImage.imageMatrix = matrix
+
+                return true
+            }
+
+        })
+
+
+
           val DOUBLE_TAP_DELAY = 200
           var doubleTapDetected = false
 
         binding.ivFullImage.setOnTouchListener { v, event ->
 
+            scaleGestureDetector.onTouchEvent(event)
+            gestureDetector.onTouchEvent(event)
+
+
             Log.d("FullImageActivity", "onCreate: fullImage touch")
+
+
 
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
+
                     if (doubleTapDetected) {
 
                         Log.d("FullImageActivity", "onCreate: doubleTap detected")
@@ -142,5 +193,7 @@ class FullImageActivity : AppCompatActivity() {
         }
 
     }
+
+
 
 }
