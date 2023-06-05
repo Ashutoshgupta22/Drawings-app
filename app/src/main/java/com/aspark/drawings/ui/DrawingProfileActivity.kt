@@ -8,10 +8,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
 import com.aspark.drawings.databinding.ActivityDrawingProfileBinding
 import com.aspark.drawings.model.Drawing
-import com.aspark.drawings.room.AppDatabase.Companion.getDatabase
 import com.aspark.drawings.utility.Utility
 import com.bumptech.glide.Glide
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class DrawingProfileActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityDrawingProfileBinding
@@ -34,8 +35,7 @@ class DrawingProfileActivity : AppCompatActivity() {
         if (drawingId != -1) {
 
             registerObserver()
-            val drawingDao = getDatabase(applicationContext).drawingDao()
-            viewModel.getDrawingById(drawingId, drawingDao)
+            viewModel.getDrawingById(drawingId)
 
         }
         else

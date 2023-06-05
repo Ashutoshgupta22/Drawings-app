@@ -7,22 +7,25 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aspark.drawings.model.Drawing
 import com.aspark.drawings.repo.DrawingRepository
-import com.aspark.drawings.room.DrawingDao
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class DrawingProfileViewModel: ViewModel() {
+@HiltViewModel
+class DrawingProfileViewModel @Inject constructor(
+    private val drawingRepo: DrawingRepository): ViewModel() {
 
     private var _drawing = MutableLiveData<Drawing>()
     val drawing: LiveData<Drawing> = _drawing
 
-     fun getDrawingById(drawingId: Int, drawingDao: DrawingDao) {
+     fun getDrawingById(drawingId: Int) {
 
          //used async await just to try it
        val deferred = viewModelScope.async(Dispatchers.IO) {
 
-           DrawingRepository(drawingDao).getDrawingById(drawingId)
+           drawingRepo.getDrawingById(drawingId)
         }
 
          viewModelScope.launch(Dispatchers.Default) {

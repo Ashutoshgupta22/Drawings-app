@@ -7,19 +7,20 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.aspark.drawings.model.Drawing
 import com.aspark.drawings.repo.DrawingRepository
-import com.aspark.drawings.room.DrawingDao
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class AddDrawingViewModel: ViewModel() {
+@HiltViewModel
+class AddDrawingViewModel @Inject constructor(
+    private val drawingRepo: DrawingRepository) : ViewModel() {
 
     private var mDrawingList = MutableLiveData<List<Drawing>>()
     val drawingList: LiveData<List<Drawing>> = mDrawingList
 
-    fun addDrawing(title: String, imagePath: String, timeAdded: Long,
-        drawingDao: DrawingDao) {
+    fun addDrawing(title: String, imagePath: String, timeAdded: Long) {
 
-        val drawingRepo = DrawingRepository(drawingDao)
         val isVerified = verifyInput(title, imagePath, timeAdded)
 
        if (isVerified){
@@ -33,19 +34,19 @@ class AddDrawingViewModel: ViewModel() {
 
            job.invokeOnCompletion {
                if (job.isCompleted)
-                   getAllDrawings(drawingDao)
+                   getAllDrawings()
            }
 
        }
     }
 
-    fun getAllDrawings(drawingDao: DrawingDao) {
+    fun getAllDrawings() {
 
         Log.d("AddDrawingViewModel", "getAllDrawings: called")
 
         viewModelScope.launch(Dispatchers.Default) {
 
-            val list = DrawingRepository(drawingDao).getAllDrawings()
+            val list = drawingRepo.getAllDrawings()
 
             //postValue updates livedata in main thread
             mDrawingList.postValue(list)
@@ -53,9 +54,7 @@ class AddDrawingViewModel: ViewModel() {
             Log.d("AddDrawingViewModel", "mDrawingList has observer: " +
                     "${mDrawingList.hasActiveObservers()}")
 
-
         }
-
     }
 
     private fun verifyInput(title: String, imagePath: String, timeAdded: Long): Boolean {

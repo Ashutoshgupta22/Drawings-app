@@ -13,16 +13,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.aspark.drawings.bottom_sheet.AddDrawingBottomSheet
 import com.aspark.drawings.bottom_sheet.AddDrawingViewModel
 import com.aspark.drawings.databinding.ActivityMainBinding
-import com.aspark.drawings.room.DrawingDao
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private val viewModel: AddDrawingViewModel by viewModels()
-    @Inject lateinit var drawingDao: DrawingDao
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,8 +32,7 @@ class MainActivity : AppCompatActivity() {
 
         checkStoragePermission()
 
-       // drawingDao = getDatabase(applicationContext).drawingDao()
-        viewModel.getAllDrawings(drawingDao)
+        viewModel.getAllDrawings()
 
         binding.fabAddDrawing.setOnClickListener {
 
@@ -83,7 +79,7 @@ class MainActivity : AppCompatActivity() {
         val bottomSheetDialog = AddDrawingBottomSheet {
 
             registerDrawingListObserver()
-            viewModel.getAllDrawings(drawingDao)
+            viewModel.getAllDrawings()
         }
         bottomSheetDialog.show(supportFragmentManager,"AddDrawingBottomSheet")
     }
@@ -115,7 +111,7 @@ class MainActivity : AppCompatActivity() {
 
         Log.d("MainActivity", "onResume: called")
         registerDrawingListObserver()
-        viewModel.getAllDrawings(drawingDao)
+        viewModel.getAllDrawings()
     }
 
 }
