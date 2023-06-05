@@ -1,4 +1,4 @@
-package com.aspark.drawings
+package com.aspark.drawings.ui
 
 import android.content.Intent
 import android.os.Bundle
@@ -60,7 +60,7 @@ class DrawingProfileActivity : AppCompatActivity() {
 
         binding.imgDrawing.setOnClickListener {
 
-            val intent = Intent(this,FullImageActivity::class.java)
+            val intent = Intent(this, FullImageActivity::class.java)
             intent.putExtra("imagePath", drawing.imagePath)
             intent.putExtra("drawingId", drawing.id)
             intent.putExtra("markerCount", drawing.markers)

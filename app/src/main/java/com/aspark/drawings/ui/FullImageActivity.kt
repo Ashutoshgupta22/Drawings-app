@@ -1,10 +1,11 @@
-package com.aspark.drawings
+package com.aspark.drawings.ui
 
 import android.annotation.SuppressLint
 import android.graphics.Color
 import android.graphics.Matrix
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.GestureDetector
 import android.view.Gravity
@@ -17,7 +18,9 @@ import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
+import com.aspark.drawings.R
 import com.aspark.drawings.bottom_sheet.AddMarkerBottomSheet
+import com.aspark.drawings.bottom_sheet.AddMarkerViewModel
 import com.aspark.drawings.databinding.ActivityFullImageBinding
 import com.aspark.drawings.model.Marker
 import com.aspark.drawings.room.AppDatabase.Companion.getDatabase
@@ -96,7 +99,7 @@ class FullImageActivity : AppCompatActivity() {
           val DOUBLE_TAP_DELAY = 200
           var doubleTapDetected = false
 
-        binding.ivFullImage.setOnTouchListener { v, event ->
+        binding.ivFullImage.setOnTouchListener { _, event ->
 
             scaleGestureDetector.onTouchEvent(event)
             gestureDetector.onTouchEvent(event)
@@ -133,7 +136,7 @@ class FullImageActivity : AppCompatActivity() {
                         // Wait for a short delay to check for a second tap
 
                         doubleTapDetected = true
-                        Handler().postDelayed({
+                        Handler(Looper.myLooper()!!).postDelayed({
                             doubleTapDetected = false
                         }, DOUBLE_TAP_DELAY.toLong())
                         false

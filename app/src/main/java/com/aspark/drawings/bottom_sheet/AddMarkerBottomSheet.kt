@@ -8,7 +8,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
-import com.aspark.drawings.AddMarkerViewModel
 import com.aspark.drawings.databinding.AddMarkerBottomSheetBinding
 import com.aspark.drawings.model.Marker
 import com.aspark.drawings.room.AppDatabase.Companion.getDatabase

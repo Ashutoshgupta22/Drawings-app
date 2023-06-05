@@ -1,4 +1,4 @@
-package com.aspark.drawings
+package com.aspark.drawings.ui
 
 
 import android.content.pm.PackageManager
@@ -13,14 +13,16 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.aspark.drawings.bottom_sheet.AddDrawingBottomSheet
 import com.aspark.drawings.bottom_sheet.AddDrawingViewModel
 import com.aspark.drawings.databinding.ActivityMainBinding
-import com.aspark.drawings.room.AppDatabase.Companion.getDatabase
 import com.aspark.drawings.room.DrawingDao
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private val viewModel: AddDrawingViewModel by viewModels()
-    private lateinit var drawingDao: DrawingDao
+    @Inject lateinit var drawingDao: DrawingDao
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,7 +35,7 @@ class MainActivity : AppCompatActivity() {
 
         checkStoragePermission()
 
-        drawingDao = getDatabase(applicationContext).drawingDao()
+       // drawingDao = getDatabase(applicationContext).drawingDao()
         viewModel.getAllDrawings(drawingDao)
 
         binding.fabAddDrawing.setOnClickListener {
