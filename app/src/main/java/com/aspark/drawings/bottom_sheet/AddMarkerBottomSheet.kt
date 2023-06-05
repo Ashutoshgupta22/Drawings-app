@@ -8,10 +8,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
-import com.aspark.drawings.AddMarkerViewModel
 import com.aspark.drawings.databinding.AddMarkerBottomSheetBinding
 import com.aspark.drawings.model.Marker
-import com.aspark.drawings.room.AppDatabase.Companion.getDatabase
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 class AddMarkerBottomSheet(
@@ -46,15 +44,10 @@ class AddMarkerBottomSheet(
 
         binding.btnSave.setOnClickListener {
 
-            val db = getDatabase(requireContext())
-            val markerDao = db.markerDao()
-            val drawingDao = db.drawingDao()
-
             val title = binding.etMarkerTitle.text.toString().trim()
             val details = binding.etMarkerDetails.text.toString().trim()
 
-            viewModel.saveMarker(drawingId, title, details, doubleTapX, doubleTapY,
-                markerDao, drawingDao)
+            viewModel.saveMarker(drawingId, title, details, doubleTapX, doubleTapY)
             dismiss()
 
             listener.onDismiss(object : DialogInterface {

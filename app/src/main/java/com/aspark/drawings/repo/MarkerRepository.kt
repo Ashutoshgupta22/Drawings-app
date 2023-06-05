@@ -2,8 +2,9 @@ package com.aspark.drawings.repo
 
 import com.aspark.drawings.model.Marker
 import com.aspark.drawings.room.MarkerDao
+import javax.inject.Inject
 
-class MarkerRepository(private val markerDao: MarkerDao) {
+class MarkerRepository @Inject constructor(private val markerDao: MarkerDao) {
 
     fun insertMarker(marker: Marker) {
 

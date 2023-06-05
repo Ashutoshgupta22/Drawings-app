@@ -1,4 +1,4 @@
-package com.aspark.drawings
+package com.aspark.drawings.bottom_sheet
 
 import android.util.Log
 import androidx.lifecycle.LiveData
@@ -8,13 +8,15 @@ import androidx.lifecycle.viewModelScope
 import com.aspark.drawings.model.Marker
 import com.aspark.drawings.repo.DrawingRepository
 import com.aspark.drawings.repo.MarkerRepository
-import com.aspark.drawings.room.DrawingDao
-import com.aspark.drawings.room.MarkerDao
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class AddMarkerViewModel: ViewModel() {
+@HiltViewModel
+class AddMarkerViewModel @Inject constructor( private val markerRepo: MarkerRepository,
+                    private val drawingRepo: DrawingRepository): ViewModel() {
 
     private var mMarkersList = MutableLiveData<List<Marker>>()
     val markersList: LiveData<List<Marker>> = mMarkersList
@@ -23,15 +25,14 @@ class AddMarkerViewModel: ViewModel() {
 
 
     fun saveMarker( drawingId: Int, title: String, details: String,
-        doubleTapX: Float, doubleTapY: Float, markerDao: MarkerDao,
-        drawingDao: DrawingDao) {
+        doubleTapX: Float, doubleTapY: Float) {
 
         val marker = Marker(title = title, details = details, drawingId = drawingId,
         doubleTapX = doubleTapX, doubleTapY = doubleTapY)
 
         val job = viewModelScope.launch(Dispatchers.IO) {
 
-            MarkerRepository(markerDao).insertMarker(marker)
+            markerRepo.insertMarker(marker)
         }
 
         job.invokeOnCompletion {
@@ -40,34 +41,32 @@ class AddMarkerViewModel: ViewModel() {
 
                 Log.d(Thread.currentThread().name, "saveMarker: job completed")
 
-                updateMarkerCount(drawingId,_markerCount.value?.plus(1)!!, drawingDao)
+                updateMarkerCount(drawingId,_markerCount.value?.plus(1)!!)
                 _markerCount.postValue(_markerCount.value?.plus(1))
-                getAllMarkers(drawingId, markerDao)
+                getAllMarkers(drawingId)
             }
         }
     }
 
-    private fun updateMarkerCount(drawingId: Int, count: Int, drawingDao: DrawingDao) {
+    private fun updateMarkerCount(drawingId: Int, count: Int) {
 
         Log.d("AddMarkerViewModel", "updateMarkerCount: called")
         viewModelScope.launch(Dispatchers.IO) {
-            DrawingRepository(drawingDao).updateMarkerCount(drawingId,count)
+            drawingRepo.updateMarkerCount(drawingId,count)
         }
-
     }
 
-    fun getAllMarkers(drawingId: Int, markerDao: MarkerDao) {
+    fun getAllMarkers(drawingId: Int) {
 
         Log.d("AddMarkerViewModel", "getAllMarkers: called")
 
         viewModelScope.launch(Dispatchers.Default) {
-            val list =  MarkerRepository(markerDao).getAllMarkers(drawingId)
+            val list =  markerRepo.getAllMarkers(drawingId)
 
             withContext(Dispatchers.Main) {
                 mMarkersList.postValue(list)
             }
         }
-
     }
 
     fun setMarkerCount(count: Int) {

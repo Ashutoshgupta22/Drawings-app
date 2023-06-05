@@ -1,4 +1,4 @@
-package com.aspark.drawings
+package com.aspark.drawings.ui
 
 import android.content.Intent
 import android.view.LayoutInflater
@@ -24,7 +24,7 @@ class DrawingAdapter(private val drawingList:  List<Drawing>):
         init {
             binding.root.setOnClickListener {
 
-                val intent = Intent(it.context,DrawingProfileActivity::class.java)
+                val intent = Intent(it.context, DrawingProfileActivity::class.java)
                 intent.putExtra("drawingId",drawingList[adapterPosition].id)
                 it.context.startActivity(intent)
 
